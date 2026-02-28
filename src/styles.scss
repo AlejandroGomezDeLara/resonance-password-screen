@@ -13,3 +13,9 @@ body {
   position: fixed;
   inset: 0;
 }
+
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}

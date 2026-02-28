@@ -29,6 +29,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   private readonly apiUrl = 'http://127.0.0.1:3000/open-door';
   private focusIntervalId: ReturnType<typeof setInterval> | null = null;
   private focusBurstTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private startupFocusRafId: number | null = null;
+  private startupFocusEndAt = 0;
 
   @ViewChild('pwdInput') pwdInput?: ElementRef<HTMLInputElement>;
   @ViewChild('successVideo') successVideo?: ElementRef<HTMLVideoElement>;
@@ -38,7 +40,8 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // Kiosk-safe focus keeper: keeps trying even if startup/render is slow.
     this.scheduleFocusBurst();
-    this.focusIntervalId = setInterval(() => this.focusPassword(), 300);
+    this.startStartupFocusLoop();
+    this.focusIntervalId = setInterval(() => this.focusPassword(), 120);
   }
 
   ngOnDestroy() {
@@ -47,6 +50,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     }
     if (this.focusBurstTimeoutId) {
       clearTimeout(this.focusBurstTimeoutId);
+    }
+    if (this.startupFocusRafId !== null) {
+      cancelAnimationFrame(this.startupFocusRafId);
     }
   }
 
@@ -165,7 +171,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   scheduleFocusBurst() {
     this.focusPassword();
     setTimeout(() => this.focusPassword(), 0);
+    setTimeout(() => this.focusPassword(), 50);
     setTimeout(() => this.focusPassword(), 120);
+    setTimeout(() => this.focusPassword(), 220);
     setTimeout(() => this.focusPassword(), 350);
     if (this.focusBurstTimeoutId) {
       clearTimeout(this.focusBurstTimeoutId);
@@ -173,6 +181,19 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.focusBurstTimeoutId = setTimeout(() => {
       this.focusBurstTimeoutId = null;
     }, 500);
+  }
+
+  startStartupFocusLoop() {
+    this.startupFocusEndAt = Date.now() + 6000;
+    const tick = () => {
+      this.focusPassword();
+      if (Date.now() < this.startupFocusEndAt) {
+        this.startupFocusRafId = requestAnimationFrame(tick);
+      } else {
+        this.startupFocusRafId = null;
+      }
+    };
+    tick();
   }
 
   focusPassword() {
