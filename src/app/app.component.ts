@@ -1,4 +1,11 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -12,7 +19,7 @@ type ScreenState = 'LOCK' | 'SUCCESS';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit, OnDestroy {
   state: ScreenState = 'LOCK';
 
   password = '';
@@ -20,11 +27,28 @@ export class AppComponent {
 
   private readonly correctPassword = 'bcdaf';
   private readonly apiUrl = 'http://127.0.0.1:3000/open-door';
+  private focusIntervalId: ReturnType<typeof setInterval> | null = null;
+  private focusBurstTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   @ViewChild('pwdInput') pwdInput?: ElementRef<HTMLInputElement>;
   @ViewChild('successVideo') successVideo?: ElementRef<HTMLVideoElement>;
 
   constructor(private http: HttpClient) {}
+
+  ngAfterViewInit() {
+    // Kiosk-safe focus keeper: keeps trying even if startup/render is slow.
+    this.scheduleFocusBurst();
+    this.focusIntervalId = setInterval(() => this.focusPassword(), 300);
+  }
+
+  ngOnDestroy() {
+    if (this.focusIntervalId) {
+      clearInterval(this.focusIntervalId);
+    }
+    if (this.focusBurstTimeoutId) {
+      clearTimeout(this.focusBurstTimeoutId);
+    }
+  }
 
   get maskedPassword(): string {
     return '*'.repeat(this.password.length);
@@ -66,7 +90,7 @@ export class AppComponent {
   resetToLock() {
     this.state = 'LOCK';
     this.inputError = false;
-    setTimeout(() => this.focusPassword(), 0);
+    this.scheduleFocusBurst();
   }
 
   triggerInputError() {
@@ -123,10 +147,38 @@ export class AppComponent {
     if (this.state !== 'LOCK') {
       return;
     }
+    this.scheduleFocusBurst();
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus() {
+    this.scheduleFocusBurst();
+  }
+
+  @HostListener('document:visibilitychange')
+  onVisibilityChange() {
+    if (!document.hidden) {
+      this.scheduleFocusBurst();
+    }
+  }
+
+  scheduleFocusBurst() {
+    this.focusPassword();
     setTimeout(() => this.focusPassword(), 0);
+    setTimeout(() => this.focusPassword(), 120);
+    setTimeout(() => this.focusPassword(), 350);
+    if (this.focusBurstTimeoutId) {
+      clearTimeout(this.focusBurstTimeoutId);
+    }
+    this.focusBurstTimeoutId = setTimeout(() => {
+      this.focusBurstTimeoutId = null;
+    }, 500);
   }
 
   focusPassword() {
-    this.pwdInput?.nativeElement.focus();
+    if (this.state !== 'LOCK') {
+      return;
+    }
+    this.pwdInput?.nativeElement.focus({ preventScroll: true });
   }
 }
