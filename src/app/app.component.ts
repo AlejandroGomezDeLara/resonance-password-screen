@@ -16,7 +16,7 @@ export class AppComponent {
   state: ScreenState = 'LOCK';
 
   password = '';
-  error = '';
+  inputError = false;
 
   private readonly correctPassword = 'bcdaf';
   private readonly apiUrl = 'http://127.0.0.1:3000/open-door';
@@ -26,8 +26,12 @@ export class AppComponent {
 
   constructor(private http: HttpClient) {}
 
+  get maskedPassword(): string {
+    return '*'.repeat(this.password.length);
+  }
+
   submit() {
-    this.error = '';
+    this.inputError = false;
 
     if (this.password === this.correctPassword) {
       this.password = '';
@@ -45,7 +49,7 @@ export class AppComponent {
         }
       }, 0);
     } else {
-      this.error = 'Incorrect password';
+      this.triggerInputError();
       this.password = '';
       setTimeout(() => this.focusPassword(), 0);
     }
@@ -61,7 +65,64 @@ export class AppComponent {
 
   resetToLock() {
     this.state = 'LOCK';
-    this.error = '';
+    this.inputError = false;
+    setTimeout(() => this.focusPassword(), 0);
+  }
+
+  triggerInputError() {
+    this.inputError = false;
+    setTimeout(() => {
+      this.inputError = true;
+      setTimeout(() => (this.inputError = false), 450);
+    }, 0);
+  }
+
+  onPasswordKeydown(event: KeyboardEvent) {
+    const { key, ctrlKey, metaKey, altKey } = event;
+
+    if (key === 'Enter' || key === 'Tab') {
+      return;
+    }
+
+    if (key === 'Backspace') {
+      this.password = this.password.slice(0, -1);
+      event.preventDefault();
+      return;
+    }
+
+    if (key === 'Delete') {
+      this.password = '';
+      event.preventDefault();
+      return;
+    }
+
+    if (ctrlKey || metaKey || altKey) {
+      event.preventDefault();
+      return;
+    }
+
+    if (key.length === 1) {
+      this.password += key;
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+  }
+
+  onPasswordPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text') ?? '';
+    if (!pastedText) {
+      return;
+    }
+    this.password += pastedText;
+  }
+
+  onPasswordBlur() {
+    if (this.state !== 'LOCK') {
+      return;
+    }
     setTimeout(() => this.focusPassword(), 0);
   }
 

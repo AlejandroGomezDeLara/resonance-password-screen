@@ -9,16 +9,21 @@
 <!-- PANTALLA LOCK -->
 <div class="lock" *ngIf="state === 'LOCK'">
   <div class="card">
-    <div class="label">Password</div>
 
     <form (ngSubmit)="submit()" autocomplete="off">
-      <input #pwdInput class="pwd" type="password" [(ngModel)]="password" name="password" placeholder="•••••"
-        autofocus />
-
-      <button class="btn" type="submit">Enter</button>
+      <input
+        #pwdInput
+        class="pwd"
+        type="text"
+        [value]="maskedPassword"
+        placeholder="*****"
+        [class.pwd-error]="inputError"
+        (keydown)="onPasswordKeydown($event)"
+        (paste)="onPasswordPaste($event)"
+        (blur)="onPasswordBlur()"
+        autofocus
+      />
     </form>
-
-    <div class="error" *ngIf="error">{{ error }}</div>
   </div>
 </div>
 
