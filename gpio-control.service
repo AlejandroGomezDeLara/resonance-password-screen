@@ -1,0 +1,14 @@
+[Unit]
+Description=GPIO Control Server for Door Lock
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/pi/resonance-password-screen
+ExecStart=/bin/bash /home/pi/resonance-password-screen/gpio-server.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
