@@ -15,6 +15,10 @@ app.use((req, res, next) => {
 
 // Al iniciar: poner GPIO 18 en bajo
 try {
+  console.log('Configurando GPIO 18 como salida (op)...');
+  execSync('pinctrl set 18 op');
+  console.log('✓ GPIO 18 configurado como salida');
+  
   console.log('Inicializando GPIO 18 a bajo (dl)...');
   execSync('pinctrl set 18 dl');
   console.log('✓ GPIO 18 inicializado en bajo');
