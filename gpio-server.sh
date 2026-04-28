@@ -21,7 +21,10 @@ control_gpio() {
     esac
 }
 
-# Inicializar GPIO a LOW al iniciar
+# Inicializar GPIO - primero configurar como salida, luego poner en LOW
+echo "Configurando GPIO pin $GPIO_PIN como salida..."
+raspi-gpio set $GPIO_PIN op
+
 echo "Inicializando GPIO pin $GPIO_PIN al estado bajo..."
 control_gpio LOW
 
