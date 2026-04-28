@@ -1,77 +1,40 @@
 const express = require('express');
 const { execSync } = require('child_process');
-const path = require('path');
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(express.json());
-
-// Enable CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-  } else {
-    next();
-  }
+  if (req.method === 'OPTIONS') res.sendStatus(200);
+  else next();
 });
 
-// Initialize GPIO pin 18 to LOW (dl) on startup
-function initializeGPIO() {
-  try {
-    console.log('Inicializando pin 18 GPIO a estado bajo (dl)...');
-    execSync('raspi-gpio set 18 dl', { stdio: 'inherit' });
-    console.log('Pin 18 GPIO inicializado correctamente');
-  } catch (error) {
-    console.error('Error al inicializar GPIO:', error.message);
-    console.warn('Nota: Asegúrate de ejecutar este programa con permisos de root (sudo)');
-  }
+// Al iniciar: poner GPIO 18 en bajo
+try {
+  console.log('Inicializando GPIO 18 a bajo (dl)...');
+  execSync('pinctrl set 18 dl');
+  console.log('✓ GPIO 18 inicializado en bajo');
+} catch (error) {
+  console.error('✗ Error al inicializar GPIO:', error.message);
 }
 
-// Endpoint to open door - sets GPIO pin 18 to HIGH (dh)
+// Endpoint: poner GPIO 18 en alto cuando contraseña es correcta
 app.post('/open-door', (req, res) => {
   try {
-    console.log('Abriendo puerta - Activando pin 18 GPIO a estado alto (dh)...');
-    execSync('raspi-gpio set 18 dh', { stdio: 'inherit' });
-    console.log('Pin 18 GPIO activado correctamente');
-    res.json({ success: true, message: 'Puerta abierta - Pin 18 GPIO activado' });
+    console.log('Abriendo puerta - GPIO 18 a alto (dh)...');
+    execSync('pinctrl set 18 dh');
+    console.log('✓ Puerta abierta');
+    res.json({ success: true, message: 'Puerta abierta' });
   } catch (error) {
-    console.error('Error al activar GPIO:', error.message);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al activar puerta',
-      error: error.message 
-    });
+    console.error('✗ Error al activar GPIO:', error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Servidor de control de puerta activo' });
-});
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`Servidor de control de puerta escuchando en puerto ${PORT}`);
-  console.log(`Endpoint: POST http://127.0.0.1:${PORT}/open-door`);
-  
-  // Initialize GPIO on startup
-  initializeGPIO();
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\nCerrando servidor...');
-  try {
-    console.log('Desactivando pin 18 GPIO a estado bajo (dl) al cerrar...');
-    execSync('raspi-gpio set 18 dl', { stdio: 'inherit' });
-  } catch (error) {
-    console.error('Error al desactivar GPIO:', error.message);
-  }
-  process.exit(0);
+  console.log(`Servidor GPIO en http://127.0.0.1:${PORT}`);
 });
