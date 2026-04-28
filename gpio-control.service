@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/home/pi/resonance-password-screen
-ExecStart=/bin/bash /home/pi/resonance-password-screen/gpio-server.sh
+ExecStart=/usr/bin/python3 /home/pi/resonance-password-screen/gpio-server.sh
 Restart=always
 RestartSec=10
 
