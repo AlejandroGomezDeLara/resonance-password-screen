@@ -5,10 +5,11 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/home/pi/resonance-password-screen
 ExecStart=/usr/bin/python3 /home/pi/resonance-password-screen/gpio-server.sh
 Restart=always
 RestartSec=10
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
