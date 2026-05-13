@@ -2,23 +2,34 @@
 
 ## Pasos de setup (ejecutar UNA SOLA VEZ en la Raspberry Pi):
 
-### 1. Copiar el servicio systemd
+### 1. Configurar el GPIO 18 como output permanente al arrancar la Raspberry Pi
+En Raspberry Pi OS actual suele ser `/boot/firmware/config.txt`. En algunas instalaciones antiguas puede ser `/boot/config.txt`.
+
+Añade esta línea:
+
+```ini
+gpio=18=op,dl
+```
+
+Eso hace que el pin 18 arranque ya como salida y en nivel bajo.
+
+### 2. Copiar el servicio systemd
 ```bash
 sudo cp gpio-control.service /etc/systemd/system/
 sudo systemctl daemon-reload
 ```
 
-### 2. Habilitar el servicio para que inicie automáticamente
+### 3. Habilitar el servicio para que inicie automáticamente
 ```bash
 sudo systemctl enable gpio-control
 ```
 
-### 3. Iniciar el servicio (o esperar a que se inicie con el próximo reinicio)
+### 4. Iniciar el servicio (o esperar a que se inicie con el próximo reinicio)
 ```bash
 sudo systemctl start gpio-control
 ```
 
-### 4. Verificar que está corriendo
+### 5. Verificar que está corriendo
 ```bash
 sudo systemctl status gpio-control
 ```
@@ -26,8 +37,9 @@ sudo systemctl status gpio-control
 ## Lo que pasa automáticamente:
 
 1. **Al encender la Raspberry Pi**:
+   - El pin 18 GPIO ya nace como salida por `config.txt`
    - El servicio `gpio-control` inicia automáticamente en background
-   - El pin 18 GPIO se pone en estado LOW (`dl`)
+   - El proceso vuelve a forzar el pin 18 a salida y LOW (`dl`)
    - El servidor HTTP escucha en `http://127.0.0.1:3000`
 
 2. **Al abrir Angular en Chromium kiosk**:

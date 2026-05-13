@@ -3,6 +3,7 @@ const { execSync } = require('child_process');
 
 const app = express();
 const PORT = 3000;
+const GPIO_PIN = 18;
 
 app.use(express.json());
 
@@ -15,21 +16,42 @@ app.use((req, res, next) => {
   next();
 });
 
-// Al iniciar: configurar GPIO 18 como salida y ponerlo abajo
+function runPinCtrl(command, successMessage) {
+  execSync(command, { stdio: 'pipe' });
+  console.log(successMessage);
+}
+
+function setPinModeOutput() {
+  runPinCtrl(`pinctrl set ${GPIO_PIN} op`, `✓ GPIO ${GPIO_PIN} configurado como salida`);
+}
+
+function setPinLow() {
+  runPinCtrl(`pinctrl set ${GPIO_PIN} dl`, `✓ GPIO ${GPIO_PIN} en bajo`);
+}
+
+function setPinHigh() {
+  runPinCtrl(`pinctrl set ${GPIO_PIN} dh`, `✓ GPIO ${GPIO_PIN} en alto`);
+}
+
+function initializeGpio() {
+  console.log(`Configurando GPIO ${GPIO_PIN} como salida y bajo...`);
+  setPinModeOutput();
+  setPinLow();
+}
+
 try {
-  console.log('Configurando GPIO 18 como salida y bajo...');
-  execSync('pinctrl set 18 op dl');
-  console.log('✓ GPIO 18 inicializado como salida en bajo');
+  initializeGpio();
 } catch (error) {
-  console.error('✗ Error al inicializar GPIO:', error.message);
+  console.error(`✗ Error al inicializar GPIO ${GPIO_PIN}:`, error.message);
 }
 
 // Endpoint: abrir puerta
 app.post('/open-door', (req, res) => {
   try {
-    console.log('Abriendo puerta - GPIO 18 a alto (dh)...');
-    execSync('pinctrl set 18 dh');
-    console.log('✓ Puerta abierta');
+    initializeGpio();
+    console.log(`Abriendo puerta - GPIO ${GPIO_PIN} a alto (dh)...`);
+    setPinModeOutput();
+    setPinHigh();
 
     res.json({
       success: true,
