@@ -3,7 +3,6 @@ const { execSync } = require('child_process');
 
 const app = express();
 const PORT = 3000;
-const DOOR_OPEN_TIME_MS = 60000; // 1 minuto
 
 app.use(express.json());
 
@@ -32,19 +31,9 @@ app.post('/open-door', (req, res) => {
     execSync('pinctrl set 18 dh');
     console.log('✓ Puerta abierta');
 
-    setTimeout(() => {
-      try {
-        console.log('Cerrando puerta - GPIO 18 a bajo (dl)...');
-        execSync('pinctrl set 18 dl');
-        console.log('✓ Puerta cerrada');
-      } catch (error) {
-        console.error('✗ Error al cerrar GPIO:', error.message);
-      }
-    }, DOOR_OPEN_TIME_MS);
-
     res.json({
       success: true,
-      message: 'Puerta abierta durante 1 minuto'
+      message: 'Puerta abierta sin cierre automatico'
     });
 
   } catch (error) {
