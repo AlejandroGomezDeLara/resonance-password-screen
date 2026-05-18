@@ -48,9 +48,9 @@ try {
 // Endpoint: abrir puerta
 app.post('/open-door', (req, res) => {
   try {
-    initializeGpio();
-    console.log(`Abriendo puerta - GPIO ${GPIO_PIN} a alto (dh)...`);
+    console.log(`Peticion recibida en /open-door. Configurando GPIO ${GPIO_PIN} como salida...`);
     setPinModeOutput();
+    console.log(`Abriendo puerta - GPIO ${GPIO_PIN} a alto (dh)...`);
     setPinHigh();
 
     res.json({
@@ -59,7 +59,7 @@ app.post('/open-door', (req, res) => {
     });
 
   } catch (error) {
-    console.error('✗ Error al activar GPIO:', error.message);
+    console.error(`✗ Error al activar GPIO ${GPIO_PIN}:`, error.message);
     res.status(500).json({
       success: false,
       error: error.message

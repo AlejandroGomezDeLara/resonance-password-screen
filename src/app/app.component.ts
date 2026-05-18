@@ -86,10 +86,16 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   onSuccessVideoEnded() {
-    // Cuando termina el vídeo, llama a la API y vuelve al lock
+    console.log('Video de success finalizado. Llamando a la API para abrir la puerta...');
     this.http.post(this.apiUrl, {}).subscribe({
-      next: () => this.resetToLock(),
-      error: () => this.resetToLock(), // aunque falle, vuelve a lock
+      next: (response) => {
+        console.log('Puerta abierta correctamente:', response);
+        this.resetToLock();
+      },
+      error: (error) => {
+        console.error('Error al llamar a la API de apertura:', error);
+        this.resetToLock();
+      },
     });
   }
 
