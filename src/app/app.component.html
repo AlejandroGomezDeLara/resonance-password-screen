@@ -1,4 +1,3 @@
-<!-- FONDO (siempre visible) -->
 <div class="bg">
   <video class="bg-video" autoplay muted loop playsinline [muted]="true">
     <source src="assets/background.mp4" type="video/mp4" />
@@ -6,10 +5,117 @@
   <div class="bg-overlay"></div>
 </div>
 
-<!-- PANTALLA LOCK -->
-<div class="lock" *ngIf="state === 'LOCK'">
-  <div class="card">
+<div class="desktop" (contextmenu)="$event.preventDefault()">
+  <div class="desktop-topbar">
+    <div class="system-pill">
+      <span class="system-dot"></span>
+      Terminal del Dr. Alejandro Rivera
+    </div>
+    <div class="system-status">Nodo B-12 | Sesion remota activa</div>
+  </div>
 
+  <div class="desktop-icons">
+    <button
+      *ngFor="let folder of folders; trackBy: trackByFolder"
+      type="button"
+      class="desktop-icon"
+      [class.desktop-icon-active]="selectedFolderId === folder.id"
+      (click)="selectedFolderId = folder.id; closeContextMenu()"
+      (dblclick)="openFolder(folder)"
+      (contextmenu)="showFolderContextMenu($event, folder)"
+    >
+      <span class="folder-art" aria-hidden="true"></span>
+      <span class="desktop-icon-name">{{ folder.name }}</span>
+      <span class="restricted-tag" *ngIf="folder.restricted">Restringido</span>
+      <span class="desktop-icon-hint">{{ folder.hint }}</span>
+    </button>
+  </div>
+
+  <div
+    class="context-menu"
+    *ngIf="contextMenu.visible"
+    [style.left.px]="contextMenu.x"
+    [style.top.px]="contextMenu.y"
+    (click)="$event.stopPropagation()"
+  >
+    <button type="button" (click)="inspectFolderFromMenu()">Abrir carpeta</button>
+    <button type="button" (click)="reopenSelectedFolder()">Examinar archivos</button>
+    <button type="button" (click)="closeContextMenu()">Cancelar</button>
+  </div>
+
+  <div class="window-backdrop" *ngIf="activeWindow" (click)="closeWindow()">
+    <section class="window" (click)="$event.stopPropagation()">
+      <header class="window-header">
+        <div>
+          <p class="window-kicker">
+            {{ activeWindow.type === 'folder' ? 'DIRECTORIO' : 'DOCUMENTO' }}
+          </p>
+          <h2>{{ activeWindow.title }}</h2>
+        </div>
+        <button type="button" class="window-close" (click)="closeWindow()">Cerrar</button>
+      </header>
+
+      <div class="window-body window-body-folder" *ngIf="activeWindow.type === 'folder'">
+        <article
+          *ngFor="let file of visibleFiles; trackBy: trackByFile"
+          class="file-card"
+          (dblclick)="openFile(file)"
+        >
+          <div class="file-icon" [attr.data-type]="file.type" aria-hidden="true"></div>
+          <span class="restricted-tag restricted-tag-file" *ngIf="file.restricted">Restringido</span>
+          <strong class="file-label" [title]="file.name">{{ file.name }}</strong>
+        </article>
+      </div>
+
+      <div class="window-body window-body-file" *ngIf="activeWindow.type === 'file'">
+        <ng-container *ngIf="isImageFile(activeWindow.file); else textFileView">
+          <figure class="image-viewer">
+            <img [src]="activeWindow.file.assetPath" [alt]="activeWindow.file.name" />
+            <figcaption>{{ activeWindow.file.preview }}</figcaption>
+          </figure>
+        </ng-container>
+
+        <ng-template #textFileView>
+          <ng-container *ngIf="isVideoFile(activeWindow.file); else plainTextView">
+            <figure class="video-viewer">
+              <video #resultVideo autoplay playsinline (ended)="onResultVideoEnded()">
+                <source [src]="activeWindow.file.assetPath" type="video/mp4" />
+              </video>
+              <figcaption>{{ activeWindow.file.preview }}</figcaption>
+            </figure>
+          </ng-container>
+
+          <ng-template #plainTextView>
+            <pre>{{ activeWindow.file.content }}</pre>
+          </ng-template>
+        </ng-template>
+      </div>
+    </section>
+  </div>
+
+  <div class="desktop-dock">
+    <div class="dock-left">
+      <span class="dock-badge">2 carpetas</span>
+      <span class="dock-badge">1 carpeta restringida</span>
+      <span class="dock-badge" *ngIf="restrictedAccessGranted">Acceso autorizado</span>
+      <span class="gate-status" [class.gate-status-open]="gateStatus === 'open'">
+        {{ gateStatus === 'open' ? 'Compuerta abierta' : 'Compuerta cerrada' }}
+      </span>
+    </div>
+    <div class="dock-right">
+      <span class="dock-badge" *ngIf="openingDoor">Abriendo compuerta...</span>
+      <span class="dock-error" *ngIf="doorError">No se pudo abrir la puerta.</span>
+      <span>{{ currentTime }}</span>
+      <button type="button" class="logout-btn" (click)="resetSession()">Bloquear</button>
+    </div>
+  </div>
+</div>
+
+<div class="lock" *ngIf="showRestrictedPrompt">
+  <div class="card">
+    <div class="lock-actions">
+      <button type="button" class="lock-close" (click)="closeRestrictedPrompt()">Cerrar</button>
+    </div>
     <form (ngSubmit)="submit()" autocomplete="off">
       <input
         #pwdInput
@@ -25,11 +131,4 @@
       />
     </form>
   </div>
-</div>
-
-<!-- PANTALLA SUCCESS (VIDEO FULLSCREEN) -->
-<div class="success" *ngIf="state === 'SUCCESS'">
-  <video #successVideo class="success-video" playsinline muted (ended)="onSuccessVideoEnded()">
-    <source src="assets/result.mp4?v=2" type="video/mp4" />
-  </video>
 </div>
