@@ -101,13 +101,6 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           preview: '',
         },
         {
-          id: 'theta-2',
-          name: 'm07_nnQ-118.jpeg',
-          type: 'img',
-          assetPath: 'assets/desktop/Clasificado/WhatsApp Image 2026-05-19 at 10.24.06.jpeg',
-          preview: '',
-        },
-        {
           id: 'theta-3',
           name: 'RZ_3f-0delta.jpeg',
           type: 'img',
@@ -152,7 +145,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   contextMenu = { visible: false, x: 0, y: 0, folderId: null as string | null };
   currentTime = '';
 
-  private readonly correctPassword = 'bcdaf';
+  private readonly correctPassword = 'bacfd';
   private readonly apiUrl = 'http://127.0.0.1:3000/open-door';
   private focusIntervalId: ReturnType<typeof setInterval> | null = null;
   private focusBurstTimeoutId: ReturnType<typeof setTimeout> | null = null;
