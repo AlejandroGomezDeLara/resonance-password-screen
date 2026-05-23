@@ -71,6 +71,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           content:
             '[WARN] El personal de vigilancia informa de un zumbido constante dentro de los muros.\n[WARN] Dos tecnicos abandonan su puesto asegurando haber visto siluetas vibrando fuera del espectro visible.\n[ALERT] La entidad no intenta romper la puerta. Espera a que alguien tenga miedo al otro lado.\n[FATAL] La sala de extraccion acumula demasiadas bajas. Demasiados cientificos han muerto intentando medir una materializacion completa.',
         },
+        {
+          id: 'sujetos-fetales',
+          name: 'registro_fetal_sujetos_1_9.txt',
+          type: 'txt',
+          content:
+            'Relacion de sujetos fetales X9. Deben investigarse de derecha a izquierda.\n\nSujeto 1: desarrollo incompleto, actividad cerebral baja pero estable.\nSujeto 2: crecimiento acelerado seguido de detencion abrupta.\nSujeto 3: humano casi perfecto; morfologia, hueso y patron neural muy cercanos a un humano viable.\nSujeto 4: espasmos reflejos durante los ciclos de oscuridad.\nSujeto 5: hipersensibilidad extrema a resonancias de baja frecuencia.\nSujeto 6: regeneracion anomala tras necrosis parcial del tejido.\nSujeto 7: feto deforme, gran cabeza, sin extremidades ni mitad del torso.\nSujeto 8: actividad nerviosa erratica y patron vibratorio anomalo en el craneo.\nSujeto 9: capsula abierta desde dentro; no hay restos organicos en sala. El sujeto se ha escapado.',
+        },
       ],
     },
     {
