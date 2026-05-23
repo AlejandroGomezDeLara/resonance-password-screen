@@ -77,11 +77,10 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       id: 'clasificado',
       name: 'Registros sensibles',
       hint: 'Evidencias visuales sobre contacto directo con las entidades.',
-      restricted: true,
       files: [
         {
           id: 'correo',
-          name: 'informe_confidencial_director.txt',
+          name: 'informe_confidencial_2.txt',
           type: 'txt',
           content:
             'Quizá pueda obtenerlo y escapar usando su energía en la máquina central.\nLa sala de extraccion ya ha matado a demasiados cientificos, no caed en su trampa.',
@@ -90,8 +89,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           id: 'foto',
           name: 'protocolo_presencia.txt',
           type: 'txt',
+          restricted: true,
           content:
-            'Hemos podido acceder a la sala de extraccion.\nSi el cubo empieza a vibrar, la alimentacion ya ha comenzado y las manifestaciones completas pueden aparecer en segundos.\nEllos se manifiestan cuando tienes miedo, tienes que controlarte.\nRecordar a todos lo mismo: respira, baja la voz, no les des lo que buscan.',
+            'Hemos podido acceder a la sala de extraccion.\nLa energía de la nave debe correr a través de vosotros.\nRecordar a todos lo mismo: respira, baja la voz, no tengas miedo.',
         },
         {
           id: 'theta-1',
@@ -109,8 +109,9 @@ export class AppComponent implements AfterViewInit, OnDestroy {
         },
         {
           id: 'theta-4',
-          name: '0x_7LM-kappa.jpeg',
+          name: 'zx_7LM-kappa.jpeg',
           type: 'img',
+          restricted: true,
           assetPath: 'assets/desktop/Clasificado/WhatsApp Image 2026-05-19 at 10.24.51.jpeg',
           preview: 'Me falta un elemento para completar la fórmula.',
         },
@@ -132,6 +133,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
           id: 'resultado-video',
           name: 'registro_sala_extraccion.mp4',
           type: 'video',
+          restricted: true,
           assetPath: 'assets/result.mp4?v=3',
           preview: 'Registro final de la sala de extraccion. Tras ver el video se abrira la compuerta, tened cuidado.',
         },
@@ -160,7 +162,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.updateClock();
-    this.clockIntervalId = setInterval(() => this.updateClock(), 1000);
+    this.clockIntervalId = setInterval(() => this.updateClock(), 30000);
   }
 
   ngOnDestroy() {

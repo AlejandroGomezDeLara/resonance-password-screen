@@ -1,7 +1,4 @@
 <div class="bg">
-  <video class="bg-video" autoplay muted loop playsinline [muted]="true">
-    <source src="assets/background.mp4" type="video/mp4" />
-  </video>
   <div class="bg-overlay"></div>
 </div>
 
@@ -26,7 +23,6 @@
     >
       <span class="folder-art" aria-hidden="true"></span>
       <span class="desktop-icon-name">{{ folder.name }}</span>
-      <span class="restricted-tag" *ngIf="folder.restricted">Restringido</span>
       <span class="desktop-icon-hint">{{ folder.hint }}</span>
     </button>
   </div>
@@ -78,7 +74,7 @@
         <ng-template #textFileView>
           <ng-container *ngIf="isVideoFile(activeWindow.file); else plainTextView">
             <figure class="video-viewer">
-              <video #resultVideo autoplay playsinline (ended)="onResultVideoEnded()">
+              <video #resultVideo autoplay playsinline preload="none" (ended)="onResultVideoEnded()">
                 <source [src]="activeWindow.file.assetPath" type="video/mp4" />
               </video>
               <figcaption>{{ activeWindow.file.preview }}</figcaption>
@@ -96,7 +92,7 @@
   <div class="desktop-dock">
     <div class="dock-left">
       <span class="dock-badge">2 carpetas</span>
-      <span class="dock-badge">1 carpeta restringida</span>
+      <span class="dock-badge">3 archivos restringidos</span>
       <span class="dock-badge" *ngIf="restrictedAccessGranted">Acceso autorizado</span>
       <span class="gate-status" [class.gate-status-open]="gateStatus === 'open'">
         {{ gateStatus === 'open' ? 'Compuerta abierta' : 'Compuerta cerrada' }}
