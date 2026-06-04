@@ -40,7 +40,12 @@
   </div>
 
   <div class="window-backdrop" *ngIf="activeWindow" (click)="closeWindow()">
-    <section class="window" (click)="$event.stopPropagation()">
+    <section
+      class="window"
+      [class.window-file]="activeWindow.type === 'file'"
+      [class.window-folder]="activeWindow.type === 'folder'"
+      (click)="$event.stopPropagation()"
+    >
       <header class="window-header">
         <div>
           <p class="window-kicker">
